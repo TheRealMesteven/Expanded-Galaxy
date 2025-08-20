@@ -125,6 +125,7 @@
   <ItemGroup>
     <Compile Include="CaptainChair.cs" />
     <Compile Include="Ammunition.cs" />
+    <Compile Include="Robot.cs" />
     <Compile Include="WarpDrive.cs" />
     <Compile Include="DistressSignal.cs" />
     <Compile Include="Missions.cs" />
