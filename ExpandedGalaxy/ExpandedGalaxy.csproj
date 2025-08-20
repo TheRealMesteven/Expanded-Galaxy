@@ -21,6 +21,7 @@
     <DefineConstants>DEBUG;TRACE</DefineConstants>
     <ErrorReport>prompt</ErrorReport>
     <WarningLevel>4</WarningLevel>
+    <NoWarn>CS0618, CS0649</NoWarn>
   </PropertyGroup>
   <PropertyGroup Condition=" '$(Configuration)|$(Platform)' == 'Release|AnyCPU' ">
     <DebugType>pdbonly</DebugType>
@@ -33,27 +34,43 @@
   <ItemGroup>
     <Reference Include=".Talents v0.0.1">
       <HintPath>..\..\..\..\..\..\Program Files (x86)\Steam\steamapps\common\PULSARLostColony\Mods\.Talents v0.0.1.dll</HintPath>
+      <HintPath>..\..\packages\.Talents v0.0.1.dll</HintPath>
+      <Private>False</Private>
     </Reference>
     <Reference Include="0Harmony">
       <HintPath>..\..\..\..\..\..\Program Files (x86)\Steam\steamapps\common\PULSARLostColony\PULSAR_LostColony_Data\Managed\0Harmony.dll</HintPath>
+      <HintPath>..\..\packages\Lib.Harmony.2.2.2\lib\net472\0Harmony.dll</HintPath>
+      <Private>False</Private>
     </Reference>
     <Reference Include="ACTk.Runtime">
       <HintPath>..\..\..\..\..\..\Program Files (x86)\Steam\steamapps\common\PULSARLostColony\PULSAR_LostColony_Data\Managed\ACTk.Runtime.dll</HintPath>
+      <HintPath>..\..\packages\PulsarLostColony.GameLibs.1.2.7.2\lib\ACTk.Runtime.dll</HintPath>
+      <Private>False</Private>
     </Reference>
     <Reference Include="Assembly-CSharp">
       <HintPath>..\..\..\..\..\..\Program Files (x86)\Steam\steamapps\common\PULSARLostColony\PULSAR_LostColony_Data\Managed\Assembly-CSharp.dll</HintPath>
+      <HintPath>..\..\packages\Assembly-CSharp.dll</HintPath>
+      <Private>False</Private>
     </Reference>
     <Reference Include="AstarPathfindingProject">
       <HintPath>..\..\..\..\..\..\Program Files (x86)\Steam\steamapps\common\PULSARLostColony\PULSAR_LostColony_Data\Managed\AstarPathfindingProject.dll</HintPath>
+      <HintPath>..\..\packages\PulsarLostColony.GameLibs.1.2.7.2\lib\AstarPathfindingProject.dll</HintPath>
+      <Private>False</Private>
     </Reference>
     <Reference Include="CrewAILibraryBuild, Version=0.0.0.0, Culture=neutral, PublicKeyToken=null">
       <HintPath>..\..\..\..\..\..\Program Files (x86)\Steam\steamapps\common\PULSARLostColony\PULSAR_LostColony_Data\Managed\CrewAILibraryBuild.dll</HintPath>
+      <HintPath>..\..\packages\PulsarLostColony.GameLibs.1.2.7.2\lib\CrewAILibraryBuild.dll</HintPath>
+      <Private>False</Private>
     </Reference>
     <Reference Include="PLInputBase">
       <HintPath>..\..\..\..\..\..\Program Files (x86)\Steam\steamapps\common\PULSARLostColony\PULSAR_LostColony_Data\Managed\PLInputBase.dll</HintPath>
+      <HintPath>..\..\packages\PulsarLostColony.GameLibs.1.2.7.2\lib\PLInputBase.dll</HintPath>
+      <Private>False</Private>
     </Reference>
     <Reference Include="PulsarModLoader">
       <HintPath>..\..\..\..\..\..\Program Files (x86)\Steam\steamapps\common\PULSARLostColony\PULSAR_LostColony_Data\Managed\PulsarModLoader.dll</HintPath>
+      <HintPath>..\..\packages\PulsarModLoader.dll</HintPath>
+      <Private>False</Private>
     </Reference>
     <Reference Include="System" />
     <Reference Include="System.Core" />
@@ -65,28 +82,44 @@
     <Reference Include="System.Xml" />
     <Reference Include="UnityEngine">
       <HintPath>..\..\..\..\..\..\Program Files (x86)\Steam\steamapps\common\PULSARLostColony\PULSAR_LostColony_Data\Managed\UnityEngine.dll</HintPath>
+      <HintPath>..\..\packages\PulsarLostColony.GameLibs.1.2.7.2\lib\UnityEngine.dll</HintPath>
+      <Private>False</Private>
     </Reference>
     <Reference Include="UnityEngine.AnimationModule, Version=0.0.0.0, Culture=neutral, processorArchitecture=MSIL">
       <SpecificVersion>False</SpecificVersion>
       <HintPath>..\..\..\..\..\..\Program Files (x86)\Steam\steamapps\common\PULSARLostColony\PULSAR_LostColony_Data\Managed\UnityEngine.AnimationModule.dll</HintPath>
+      <HintPath>..\..\packages\PulsarLostColony.GameLibs.1.2.7.2\lib\UnityEngine.AnimationModule.dll</HintPath>
+      <Private>False</Private>
     </Reference>
     <Reference Include="UnityEngine.CoreModule">
       <HintPath>..\..\..\..\..\..\Program Files (x86)\Steam\steamapps\common\PULSARLostColony\PULSAR_LostColony_Data\Managed\UnityEngine.CoreModule.dll</HintPath>
+      <HintPath>..\..\packages\PulsarLostColony.GameLibs.1.2.7.2\lib\UnityEngine.CoreModule.dll</HintPath>
+      <Private>False</Private>
     </Reference>
     <Reference Include="UnityEngine.IMGUIModule, Version=0.0.0.0, Culture=neutral, PublicKeyToken=null">
       <HintPath>..\..\..\..\..\..\Program Files (x86)\Steam\steamapps\common\PULSARLostColony\PULSAR_LostColony_Data\Managed\UnityEngine.IMGUIModule.dll</HintPath>
+      <HintPath>..\..\packages\PulsarLostColony.GameLibs.1.2.7.2\lib\UnityEngine.IMGUIModule.dll</HintPath>
+      <Private>False</Private>
     </Reference>
     <Reference Include="UnityEngine.ParticleSystemModule">
       <HintPath>..\..\..\..\..\..\Program Files (x86)\Steam\steamapps\common\PULSARLostColony\PULSAR_LostColony_Data\Managed\UnityEngine.ParticleSystemModule.dll</HintPath>
+      <HintPath>..\..\packages\PulsarLostColony.GameLibs.1.2.7.2\lib\UnityEngine.ParticleSystemModule.dll</HintPath>
+      <Private>False</Private>
     </Reference>
     <Reference Include="UnityEngine.PhysicsModule">
       <HintPath>..\..\..\..\..\..\Program Files (x86)\Steam\steamapps\common\PULSARLostColony\PULSAR_LostColony_Data\Managed\UnityEngine.PhysicsModule.dll</HintPath>
+      <HintPath>..\..\packages\PulsarLostColony.GameLibs.1.2.7.2\lib\UnityEngine.PhysicsModule.dll</HintPath>
+      <Private>False</Private>
     </Reference>
     <Reference Include="UnityEngine.TextRenderingModule, Version=0.0.0.0, Culture=neutral, PublicKeyToken=null">
       <HintPath>..\..\..\..\..\..\Program Files (x86)\Steam\steamapps\common\PULSARLostColony\PULSAR_LostColony_Data\Managed\UnityEngine.TextRenderingModule.dll</HintPath>
+      <HintPath>..\..\packages\PulsarLostColony.GameLibs.1.2.7.2\lib\UnityEngine.TextRenderingModule.dll</HintPath>
+      <Private>False</Private>
     </Reference>
     <Reference Include="UnityEngine.UI, Version=1.0.0.0, Culture=neutral, PublicKeyToken=null">
       <HintPath>..\..\..\..\..\..\Program Files (x86)\Steam\steamapps\common\PULSARLostColony\PULSAR_LostColony_Data\Managed\UnityEngine.UI.dll</HintPath>
+      <HintPath>..\..\packages\PulsarLostColony.GameLibs.1.2.7.2\lib\UnityEngine.UI.dll</HintPath>
+      <Private>False</Private>
     </Reference>
   </ItemGroup>
   <ItemGroup>
@@ -125,4 +158,23 @@
     <Compile Include="Properties\AssemblyInfo.cs" />
   </ItemGroup>
   <Import Project="$(MSBuildToolsPath)\Microsoft.CSharp.targets" />
+  <!-- Copy select files from output dir to Mods dir -->
+  <Target Name="DeployMod" AfterTargets="AfterBuild" Condition="'$(PULSAR_PATH)' != ''">
+    <Error Condition="!Exists('$(PULSAR_PATH)')" Text="PULSAR_PATH set but directory doesn't exist!  Ensure the path is right: PULSAR_PATH='$(PULSAR_PATH)'" />
+    <CombinePath BasePath="$(PULSAR_PATH)" Paths="PULSAR_LostColony_Data\Managed">
+      <Output TaskParameter="CombinedPaths" PropertyName="ManagedDir" />
+    </CombinePath>
+    <CombinePath BasePath="$(PULSAR_PATH)" Paths="Mods">
+      <Output TaskParameter="CombinedPaths" PropertyName="ModsDir" />
+    </CombinePath>
+    <CreateItem Include="$(TargetDir)\*.md">
+      <Output TaskParameter="Include" ItemName="MarkdownFiles" />
+    </CreateItem>
+    <CreateItem Include="$(TargetDir)\*.dll*">
+      <Output TaskParameter="Include" ItemName="Assemblies" />
+    </CreateItem>
+    <Message Importance="High" Text="Copying build output to Mods directory: $(ModsDir)" />
+    <Copy SourceFiles="@(MarkdownFiles)" DestinationFiles="@(MarkdownFiles->'$(ModsDir)\%(RecursiveDir)%(Filename)%(Extension)')" />
+    <Copy SourceFiles="@(Assemblies)" DestinationFiles="@(Assemblies->'$(ModsDir)\%(RecursiveDir)%(Filename)%(Extension)')" />
+  </Target>
 </Project>
