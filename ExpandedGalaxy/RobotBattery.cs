@@ -1,11 +1,11 @@
 ﻿using HarmonyLib;
+using PulsarModLoader.Content.Components.MissionShipComponent;
+using System;
 using System.Collections.Generic;
 using System.Linq;
-using System.Reflection;
 using System.Reflection.Emit;
 using UnityEngine;
 using static HarmonyLib.AccessTools;
-using static PLBurrowArena;
 using static PulsarModLoader.Patches.HarmonyHelpers;
 
 namespace ExpandedGalaxy
@@ -14,9 +14,15 @@ namespace ExpandedGalaxy
     /// Changes to add Robot Battery Life
     /// </summary>
     /* - Add component (Flat circle shield generator) that robot respawns on / charges on.
-     * - Increase Charge Time
      * - Talent to increase battery life
      * - Increase power draw with sprinting or stamina regen
+     * - Toggle on and off battery usage
+     * - ? Can turn self into Aux Boost? (Get stunned in place)
+     * - ? Recharging has power draw?
+     * - Consume old battery (biscuit eating sound)
+     * - ? Overclock talent - Can run x faster at increased battery consumption
+     * - ? No place like home talent - Recharge anywhere on ship
+     * - Cant heal with atrium or healing beam rifle (? Repair gun will need to take Ammo, 200 like healing beam)
     */
     class RobotBattery
     {
@@ -27,6 +33,10 @@ namespace ExpandedGalaxy
         internal static readonly Color DEFAULT_COLOR = new Color(0.4886f, 0.2261f, 0.6029f, 1);
 
         static float FootstepsSinceLastReset => PLGameProgressManager.Instance.FootstepsTaken - StepsTaken;
+
+        internal static Material ChargerMaterial = null;
+
+        #region Robot-Battery
 
         [HarmonyPatch(typeof(PLInGameUI), "Update")]
         class RobotBatteryDisplay
@@ -105,55 +115,18 @@ namespace ExpandedGalaxy
             }
         }
 
-        [HarmonyPatch(typeof(PLLifeSupportSystem), "Update")]
-        class RefillBatteryLifeSupport
-        {
-            static float ChargeAccumulator = 0f; // For a value like `1601438` `0.01` is too small
-            public static void Postfix(PLLifeSupportSystem __instance)
-            {
-                if (__instance.MyShipInfo?.MyTLI == PLNetworkManager.Instance?.LocalPlayer?.MyCurrentTLI &&
-                PLNetworkManager.Instance.LocalPlayer.GetPawn() != null && __instance.MyInstance != null)
-                {
-                    float sqrDist = (PLNetworkManager.Instance.LocalPlayer.GetPawn().transform.position - __instance.MyInstance.transform.position).sqrMagnitude;
-                    if (sqrDist < __instance.Range && !__instance.OnFire && FootstepsSinceLastReset <= MAX_STEPS_GROUND + 1)
-                    {
-                        ChargeAccumulator += 0.3f * __instance.GetHealthRatio();
-                        if (ChargeAccumulator >= 1f)
-                        {
-                            StepsTaken += Mathf.FloorToInt(ChargeAccumulator);
-                            ChargeAccumulator -= Mathf.Floor(ChargeAccumulator);
-                        }
-                    }
-                }
-            }
-        }
-
         [HarmonyPatch(typeof(PLController), "IsEncumbered")]
         class BatteryDrained
         {
             public static bool Prefix(PLController __instance, ref bool __result)
             {
                 if (__instance.MyPawn?.GetPlayer() == PLNetworkManager.Instance?.LocalPlayer &&
-                    PLNetworkManager.Instance?.ViewedPawn?.GetPlayer()?.RaceID == 2 && FootstepsSinceLastReset > MAX_STEPS_GROUND)
+                    PLNetworkManager.Instance?.ViewedPawn?.GetPlayer()?.RaceID == 2 && (FootstepsSinceLastReset > MAX_STEPS_GROUND || StandingOnCharger))
                 {
                     __result = true;
                     return false;
                 }
                 return true;
-            }
-        }
-
-        [HarmonyPatch(typeof(PLServer), "Start")]
-        class ResetBattery
-        {
-            public static void Postfix()
-            {
-                if (PLInGameUI.Instance != null)
-                {
-                    PLInGameUI.Instance.ABLabel.text = "CL";
-                    PLInGameUI.Instance.ABLabel.color = RobotBattery.DEFAULT_COLOR;
-                    PLInGameUI.Instance.ABFill.color = RobotBattery.DEFAULT_COLOR;
-                }
             }
         }
 
@@ -188,11 +161,84 @@ namespace ExpandedGalaxy
             {
                 if (PLNetworkManager.Instance?.ViewedPawn?.GetPlayer()?.RaceID == 2)
                 {
-                    PLGlobal.Instance.SetBottomInfo("", "<color=red>" + PLLocalize.Localize("Battery Depleted", false) + "</color>", "", "");
-                    return;
+                    if (FootstepsSinceLastReset > MAX_STEPS_GROUND)
+                    {
+                        PLGlobal.Instance.SetBottomInfo("", "<color=red>" + PLLocalize.Localize("Battery Depleted", false) + "</color>", "", "");
+                        return;
+                    }
                 }
                 PLGlobal.Instance.SetBottomInfo("", "<color=red>" + PLLocalize.Localize("You are encumbered", false) + "</color>", "", "");
             }
         }
+        #endregion
+        #region Robot-Charger
+
+        static bool StandingOnCharger = false;
+
+        [HarmonyPatch(typeof(PLLifeSupportSystem), "Update")]
+        class RefillBatteryLifeSupport
+        {
+            static float ChargeAccumulator = 0f; // For a value like `1601438` `0.01` is too small
+            static float LastCheckedTime = 0f;
+            public static void Postfix(PLLifeSupportSystem __instance)
+            {
+                if (__instance.MyShipInfo?.MyTLI == PLNetworkManager.Instance?.LocalPlayer?.MyCurrentTLI &&
+                PLNetworkManager.Instance.LocalPlayer.GetPawn() != null && __instance.MyInstance != null)
+                {
+                    // Raycast check if standing on charger method
+                    if (PLNetworkManager.Instance.LocalPlayer.RaceID != 2 || __instance.OnFire || !(FootstepsSinceLastReset <= MAX_STEPS_GROUND + 1) || (Time.time - LastCheckedTime < 10f && !StandingOnCharger)) return;
+                    LastCheckedTime = Time.time;
+
+                    PLPawn Pawn = PLNetworkManager.Instance.LocalPlayer.GetPawn();
+                    Ray ray = new Ray(Pawn.gameObject.transform.position, Vector3.down);
+                    RaycastHit raycastHit;
+                    if (Physics.Raycast(ray, out raycastHit, 10f, Pawn.GetCurrentRaycastCollisionMask()))
+                    {
+                        if (raycastHit.collider != null && raycastHit.collider.gameObject != null && raycastHit.collider.gameObject.name.Contains("Cargo") && !raycastHit.collider.gameObject.name.Contains("Base"))
+                        {
+                            if (int.TryParse(raycastHit.collider.gameObject.transform.parent.name.Split('_').Last(), out int padId))
+                            {
+                                CargoObjectDisplay detectedCargo = PLEncounterManager.Instance.PlayerShip.GetCargoComponentForID(padId - 1);
+                                if (detectedCargo != null)
+                                {
+                                    ChargeAccumulator += 0.3f * __instance.GetHealthRatio();
+
+                                    int gainedSteps = Mathf.FloorToInt(ChargeAccumulator);
+                                    if (gainedSteps > 0)
+                                    {
+                                        StepsTaken += gainedSteps;
+                                        ChargeAccumulator -= gainedSteps;
+                                    }
+                                    StandingOnCharger = true;
+                                    return;
+                                }
+                            }
+                        }
+                    }
+                    StandingOnCharger = false;
+
+                    /* Old Method (Stand near life support)
+                    float sqrDist = (PLNetworkManager.Instance.LocalPlayer.GetPawn().transform.position - __instance.MyInstance.transform.position).sqrMagnitude;
+                    if (sqrDist < __instance.Range && !__instance.OnFire && FootstepsSinceLastReset <= MAX_STEPS_GROUND + 1)
+                    {
+                        ChargeAccumulator += 0.3f * __instance.GetHealthRatio();
+                        if (ChargeAccumulator >= 1f)
+                        {
+                            StepsTaken += Mathf.FloorToInt(ChargeAccumulator);
+                            ChargeAccumulator -= Mathf.Floor(ChargeAccumulator);
+                        }
+                    }
+                    */
+                }
+            }
+        }
+
+        class RobotCharger : MissionShipComponentMod
+        {
+            public override string Name => "Robot Charger";
+            public override string Description => "A device used to assemble and charge robots";
+            public override int CargoVisualID => 40;
+        }
+        #endregion
     }
 }

@@ -1,6 +1,7 @@
 ﻿using HarmonyLib;
 using PulsarModLoader;
 using System.Collections.Generic;
+using System.Linq;
 using UnityEngine;
 
 namespace ExpandedGalaxy
@@ -46,6 +47,30 @@ namespace ExpandedGalaxy
                 PLInGameUI.Instance.ABLabel.text = "CL";
                 PLInGameUI.Instance.ABLabel.color = RobotBattery.DEFAULT_COLOR;
                 PLInGameUI.Instance.ABFill.color = RobotBattery.DEFAULT_COLOR;
+            }
+        }
+
+        [HarmonyPatch(typeof(PLServer), "Start")]
+        class Initialize
+        {
+            static bool materialsCached = false;
+            public static void Postfix()
+            {
+                if (PLInGameUI.Instance != null)
+                {
+                    PLInGameUI.Instance.ABLabel.text = "CL";
+                    PLInGameUI.Instance.ABLabel.color = RobotBattery.DEFAULT_COLOR;
+                    PLInGameUI.Instance.ABFill.color = RobotBattery.DEFAULT_COLOR;
+                }
+
+                if (materialsCached) return;
+                materialsCached = true;
+
+                /*foreach (var mat in Resources.FindObjectsOfTypeAll<Material>())
+                    Debug.Log(mat.name);*/
+
+                Material foundMat = Resources.FindObjectsOfTypeAll<Material>().FirstOrDefault(m => m.name == "Cargo_01_DIFFUSE");
+                if (foundMat != null) RobotBattery.ChargerMaterial = foundMat;
             }
         }
     }
