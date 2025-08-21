@@ -41,9 +41,12 @@ namespace ExpandedGalaxy
             Traverse traverse = Traverse.Create(PLGlobal.Instance);
             traverse.Field("CachedTalentInfos").SetValue(new Dictionary<int, TalentInfo>());
             base.Unload();
-            PLInGameUI.Instance.ABLabel.text = "CL";
-            PLInGameUI.Instance.ABLabel.color = RobotBattery.DEFAULT_COLOR;
-            PLInGameUI.Instance.ABFill.color = RobotBattery.DEFAULT_COLOR;
+            if (PLInGameUI.Instance != null)
+            {
+                PLInGameUI.Instance.ABLabel.text = "CL";
+                PLInGameUI.Instance.ABLabel.color = RobotBattery.DEFAULT_COLOR;
+                PLInGameUI.Instance.ABFill.color = RobotBattery.DEFAULT_COLOR;
+            }
         }
     }
 }
