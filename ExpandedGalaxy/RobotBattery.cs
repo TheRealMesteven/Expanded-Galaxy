@@ -3,7 +3,9 @@ using PulsarModLoader.Content.Components.MissionShipComponent;
 using System;
 using System.Collections.Generic;
 using System.Linq;
+using System.Reflection;
 using System.Reflection.Emit;
+using System.Runtime.CompilerServices;
 using UnityEngine;
 using static HarmonyLib.AccessTools;
 using static PulsarModLoader.Patches.HarmonyHelpers;
@@ -161,6 +163,11 @@ namespace ExpandedGalaxy
             {
                 if (PLNetworkManager.Instance?.ViewedPawn?.GetPlayer()?.RaceID == 2)
                 {
+                    if (StandingOnCharger)
+                    {
+                        PLGlobal.Instance.SetBottomInfo("[Override]", "<color=orange>" + PLLocalize.Localize("Charging", false) + "</color>", "", "");
+                        return;
+                    }
                     if (FootstepsSinceLastReset > MAX_STEPS_GROUND)
                     {
                         PLGlobal.Instance.SetBottomInfo("", "<color=red>" + PLLocalize.Localize("Battery Depleted", false) + "</color>", "", "");
@@ -228,6 +235,37 @@ namespace ExpandedGalaxy
                             ChargeAccumulator -= Mathf.Floor(ChargeAccumulator);
                         }
                     }
+                    */
+                }
+            }
+        }
+
+        [HarmonyPatch(typeof(PLGlobal), "SetBottomInfo")]
+        class DisplayCharging
+        {
+            static FieldInfo m_BottomInfoLabelStringTopinfo = AccessTools.Field(typeof(PLGlobal), "m_BottomInfoLabelStringTop");
+            //static FieldInfo m_BottomInfoLabelStringinfo = AccessTools.Field(typeof(PLGlobal), "m_BottomInfoLabelString");
+            static FieldInfo m_BottomInfoLabelString_InputActioninfo = AccessTools.Field(typeof(PLGlobal), "m_BottomInfoLabelString_InputAction");
+            static FieldInfo m_BottomInfoLabelStringTop_InputActioninfo = AccessTools.Field(typeof(PLGlobal), "m_BottomInfoLabelStringTop_InputAction");
+            static FieldInfo m_LastBottomInfoLabelStringSetTimeinfo = AccessTools.Field(typeof(PLGlobal), "m_LastBottomInfoLabelStringSetTime");
+            public static void Prefix(PLGlobal __instance, ref string inBottom, ref string inTop, ref string inBottomInputAction, ref string inTopInputAction)
+            {
+                if (inBottom == "[Override]")
+                {
+                    inBottom = inTop;
+                    inTop = (string)m_BottomInfoLabelStringTopinfo.GetValue(__instance);
+                    inBottomInputAction = (string)m_BottomInfoLabelString_InputActioninfo.GetValue(__instance);
+                    inTopInputAction = (string)m_BottomInfoLabelStringTop_InputActioninfo.GetValue(__instance);
+                    m_LastBottomInfoLabelStringSetTimeinfo.SetValue(__instance, Time.frameCount - (int)m_LastBottomInfoLabelStringSetTimeinfo.GetValue(__instance));
+
+                    /* Old code (Big text)
+                    string oldTop = (string)m_BottomInfoLabelStringTopinfo.GetValue(__instance);
+                    if (oldTop.Contains(inTop)) return;
+                    inTop = oldTop + "\n" +inTop;
+                    inBottom = (string)m_BottomInfoLabelStringinfo.GetValue(__instance);
+                    inBottomInputAction = (string)m_BottomInfoLabelString_InputActioninfo.GetValue(__instance);
+                    inTopInputAction = (string)m_BottomInfoLabelStringTop_InputActioninfo.GetValue(__instance);
+                    m_LastBottomInfoLabelStringSetTimeinfo.SetValue(__instance, Time.frameCount - (int)m_LastBottomInfoLabelStringSetTimeinfo.GetValue(__instance));
                     */
                 }
             }
